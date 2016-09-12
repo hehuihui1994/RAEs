@@ -8,3 +8,11 @@
 
 ## 方法
 [RAEs](https://hehuihui1994.github.io/hehuihui1994.github.io/2016/08/26/RAEs/#5-无监督RAE方法（重点）)
+
+## 文件说明
+
+* jrae文件夹
+
+  JRAE中使用RAEs的方法发现与任务相关的特征，该工具的使用方法见[这里](https://hehuihui1994.github.io/hehuihui1994.github.io/2016/09/11/RAE%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8-jrae/#more) 。
+
+  ​

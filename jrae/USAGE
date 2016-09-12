@@ -1,0 +1,143 @@
+Refer run.sh for sample usage.
+
+-DataDir DIR
+	Use all txt files in DIR as data. The data files are organized such that 
+	all instances corresponding to one class are listed in a single file 
+	named with its label. Each line in the text file is treated as a single 
+	data instance. All the test data may be put together into a single 
+	file with the same formatting if the labels are unknown. If the labels
+	are known, then use the same filename as you would for training data, 
+	but prefix it with "test_". So for example, all training data for the class
+	"action_thriller" will go into "action_thriller.txt" and test data of type
+	"action_thriller" go into "test_action_thriller.txt". 
+	
+	If test labels are known, jrae will print out the final accuracy figures 
+	when the test completes.
+
+-minCount MINCOUNT
+	Default value is 5. Only words which occur atleast MINCOUNT number of times
+	are included in the vocabulary.
+
+-TrainModel TRUE|FALSE
+	Indicates whether to train an RAE based on the data provided by the DIR
+	directive. 
+			
+-ModelFile FILE
+	This parameter is compulsory. FILE indicates the file into which the 
+	trained RAE model is saved if TRAINMODEL is set to TRUE. If not, it 
+	indicates the model file to be loaded to perform testing or feature 
+	extraction.
+	
+-ClassifierFile FILE
+	This parameter is compulsory. FILE indicates the file into which  the
+	trained classifier is saved if TRAINMODEL is set to TRUE. If not, it
+	indicates the model file to be loaded in to perform testing.
+	
+-FeaturesOutputFile FILE
+	This parameter is used only if not training. When not training, one of
+	FeaturesOutputFile or ProbabilitiesOutputFile is compulsory. The system
+	extracts features for the test data using the Model and saves it in FILE  
+	
+	NOTE :: FILE should either not be a txt file or it should not point to the
+	same directory as the -DataDir option. The next time jrae processes the 
+	directory, it will read in the probabilities as training data.
+
+-ProbabilitiesOutputFile FILE
+	This parameter is used only if not training. When not training, one of
+	FeaturesOutputFile or ProbabilitiesOutputFile is compulsory. The system
+	classifies the test instances and saves the probabilities of the item 
+	belonging to each class into FILE. The classes are numbered 0 to K-1, 
+	and indicates a class label. The ordering of the class labels is the
+	alphabetical ordering of files in the -DataDir option. This will be 
+	fixed in the next commit to list the labels themselves instead of the 
+	label index. 
+		
+	NOTE :: FILE should either not be a txt file or it should not point to the
+	same directory as the -DataDir option. The next time jrae processes the 
+	directory, it will read in the probabilities as training data.
+
+-TreeDumpDir DIR
+	Set DIR to point to point to a directory where you want to dump out all
+	the trees. You can use this parameter both during training and testing.
+	For each data item, it writes out three files as follows with each line
+	containing information about a subtree of the RAE model. 
+	(# stands for data item number, with index starting at 1):
+		* sent#_strings.txt
+			Each line is of the form <n word1 word2 ... wordn>
+			n indicates how long the subtree is.
+	
+		* sent#_classifierOutput.txt
+			The probability emitted by the classifier indicating which 
+			class it belongs to. It is increasing order of label. 
+			NOTE: The ordering of the labels is listed in "labels.map". 
+		
+		* sent#_nodeVecs.txt
+			Each line contains the features calculated by the RAE model at 
+			each node. This is the feature of the entire subtree underneath 
+			this node.  
+		
+	There is also a treeStructures.txt file which lists the tree structure 
+	built by the RAE, one data item per line. The first "n" values indicate
+	the index of the parent of the individual tokens in the data item. The 
+	next "n-1" entries each correspond to the internal nodes built by the 
+	RAE model.  
+		
+-NumCores NUMCORES
+	Indicates how many parallel threads to use for feature processing. 
+	Ideally it is the same as the number of cores on the machine but never
+	more. If this field is not set, it automatically sets this value to
+	the number of cores on the processor.
+
+-NumFolds NUMFOLDS
+	While doing a full demo run, indicates the number of folds to split 
+	the data into. Ignored by all other interfaces.
+
+-MaxIterations MAXITERATIONS
+	The number of iterations for training the RAE. The default is 80.
+			
+-embeddingSize EMBEDDINGSIZE
+	The RAE performs feature extraction by first embedding each word in
+	the vocabulary into a high dimensional real space. Defaults to 50. 
+	Higher values may result in severly increasing the training time.
+
+-alphaCat ALPHA
+	ALPHA is in [0,1] which indicates the balance between optimizing for
+	classification loss against auto-encoder loss. In detail : feature 
+	learning is performed by minimizing the reconstruction error. It is
+	also possible to minimize for a classification loss which is indicates
+	of how informative a single word is of the final class the sentence
+	belongs to. Defaults to 0.2.
+
+	For example, a word like "awesome" is highly indicative of a good 
+	review. If your corpus is full of such words, increase the value of
+	this parameter.
+			
+-Beta BETA
+	BETA is in [0,1] and indicates the weight on the classification loss.
+	Defaults to 0.5.
+			
+-lambdaW LAMBDAW
+	All lambda are weights on the regularization terms. LambdaW is the weight
+	on the embedding W1 - W4 (Refer the paper for more details)
+			
+-lambdaL LAMBDAL
+	All lambda are weights on the regularization terms. LAMBDAL is the weight
+	on the embedding We (Refer the paper for more details)
+			
+-lambdaCat LAMBDACAT
+	All lambda are weights on the regularization terms. LAMBDACAT is the 
+	weight on the classifier weights.
+
+-lambdaRAE LAMBDARAE
+	All lambda are weights on the regularization terms. LAMBDARAE is the 
+	weight on the classifier weights. This differs from LAMBDACAT in that 
+	this is applied in the second phase where the RAE is being fine-tuned 
+	(Refer the paper for more details)
+
+-CurriculumLearning 
+	FLAG is set to False by default. Set to True to turn on Curriculum
+	learning. Refer to Bengio,Y ICML 09 for more details.
+
+--help
+	Print this message and quit.
+
